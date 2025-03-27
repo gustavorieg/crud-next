@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import "./styles.css"; // Importa o CSS puro
 
 export default function Home() {
     const [users, setUsers] = useState([]);
@@ -21,7 +22,6 @@ export default function Home() {
         e.preventDefault();
 
         if (editingId) {
-            // Editar usuário
             await fetch(`/api/users/${editingId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -29,7 +29,6 @@ export default function Home() {
             });
             setEditingId(null);
         } else {
-            // Criar novo usuário
             await fetch("/api/users", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -54,40 +53,56 @@ export default function Home() {
     };
 
     return (
-        <div className="max-w-lg mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">CRUD de Usuários</h1>
+        <div className="container">
+            <div className="card">
+                <h1>CRUD de Usuários</h1>
 
-            <form onSubmit={handleSubmit} className="mb-4">
-                <input
-                    className="border p-2 w-full"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Nome"
-                    required
-                />
-                <input
-                    className="border p-2 w-full mt-2"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email"
-                    required
-                />
-                <button className="bg-blue-500 text-white px-4 py-2 mt-2 w-full">
-                    {editingId ? "Atualizar" : "Salvar"}
-                </button>
-            </form>
+                {/* Formulário */}
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Nome"
+                        required
+                    />
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email"
+                        required
+                    />
+                    <button className={editingId ? "edit" : "save"}>
+                        {editingId ? "Atualizar Usuário" : "Salvar Usuário"}
+                    </button>
+                </form>
 
-            <ul>
-                {users.map((user) => (
-                    <li key={user.id} className="border p-2 my-2 flex justify-between items-center">
-                        <span>{user.name} - {user.email}</span>
-                        <div>
-                            <button onClick={() => handleEdit(user)} className="bg-yellow-500 text-white px-2 mx-1">Editar</button>
-                            <button onClick={() => handleDelete(user.id)} className="bg-red-500 text-white px-2">X</button>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+                {/* Tabela de Usuários */}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {users.map((user) => (
+                            <tr key={user.id}>
+                                <td>{user.id}</td>
+                                <td>{user.name}</td>
+                                <td>{user.email}</td>
+                                <td className="actions">
+                                    <button className="edit" onClick={() => handleEdit(user)}>Editar</button>
+                                    <button className="delete" onClick={() => handleDelete(user.id)}>Excluir</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
